@@ -3,8 +3,8 @@
 import fetch from 'isomorphic-fetch';
 import fs from 'fs';
 import {utils} from 'ethers';
-import VaultAbi from './abis/harvest_vault.json';
-import PoolAbi from './abis/harvest_pool.json';
+import VaultAbi from './abis/harvest_vault.json' assert { type: 'json' };
+import PoolAbi from './abis/harvest_pool.json' assert { type: 'json' };
 const VAULTS_URL = 'https://api-ui.harvest.finance/vaults?key=41e90ced-d559-4433-b390-af424fdc76d6'
 
 const abisPath = 'harvest/abis/';
@@ -46,12 +46,12 @@ function b2cPoolTemplate(vault) {
 
 function contractsInfoVaultTemplate(v) {
   // address must be mixed case checksum
-  return `_HARVEST("${utils.getAddress(v.vaultAddress)}", "${v.id} ", ${v.decimals}, "f${v.id} ", 18)`;
+  return `_HARVEST("${utils.getAddress(v.vaultAddress)}", "${v.id}", ${v.decimals}, "f${v.id}", 18)`;
 }
 
 function contractsInfoPoolTemplate(v) {
   // address must be mixed case checksum
-  return `_HARVEST("${utils.getAddress(v.rewardPool)}", "f${v.id} ", 18, "", 18)`;
+  return `_HARVEST("${utils.getAddress(v.rewardPool)}", "f${v.id}", 18, "", 18)`;
 }
 
 async function fetchJson(url) {
