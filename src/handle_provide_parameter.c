@@ -1,17 +1,9 @@
 #include "harvest_plugin.h"
 
 static void handle_amount(ethPluginProvideParameter_t *msg, context_t *context) {
-    if (context->go_to_offset) {
-        if (msg->parameterOffset != context->offset + SELECTOR_SIZE) {
-            return;
-        }
-        context->go_to_offset = false;
-    }
     switch (context->next_param) {
         case AMOUNT:
-            copy_parameter(context->amount,
-                           msg->parameter,
-                           sizeof(context->amount));
+            copy_parameter(context->amount, msg->parameter, sizeof(context->amount));
 
             context->next_param = UNEXPECTED_PARAMETER;
             break;
@@ -21,7 +13,6 @@ static void handle_amount(ethPluginProvideParameter_t *msg, context_t *context) 
             break;
     }
 }
-
 
 void handle_provide_parameter(void *parameters) {
     ethPluginProvideParameter_t *msg = (ethPluginProvideParameter_t *) parameters;

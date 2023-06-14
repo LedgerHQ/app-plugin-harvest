@@ -33,7 +33,7 @@ export function testRawTx(method, rawTx, screensS = 5, screensSPX = 5) {
 }
 
 // Test from constructed transaction
-export function testTx(contractAddr, abi, method, params=[], screensS = 5, screensSPX = 5) {
+export function testTx(contractAddr, abi, method, params=[], screensS = 7, screensSPX = 7) {
 
   nano_models.forEach(function (model) {
     test('[Nano ' + model.letter + '] '+method, zemu(model, async (sim, eth) => {

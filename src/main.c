@@ -16,30 +16,11 @@
  ********************************************************************************/
 
 #include <stdbool.h>
-#include <stdint.h>
 #include <string.h>
 
 #include "os.h"
 #include "cx.h"
-
 #include "harvest_plugin.h"
-
-// List of selectors supported by this plugin.
-static const uint32_t VAULT_DEPOSIT_SELECTOR   = 0xb6b55f25;
-static const uint32_t VAULT_WITHDRAW_SELECTOR  = 0x2e1a7d4d;
-static const uint32_t POOL_STAKE_SELECTOR      = 0xa694fc3a;
-static const uint32_t POOL_GET_REWARD_SELECTOR = 0x3d18b912;
-static const uint32_t POOL_EXIT_SELECTOR       = 0xe9fad8ee;
-
-// Array of all the different boilerplate selectors. Make sure this follows the same order as the
-// enum defined in `harvest_plugin.h`
-const uint32_t HARVEST_SELECTORS[NUM_SELECTORS] = {
-    VAULT_DEPOSIT_SELECTOR,
-    VAULT_WITHDRAW_SELECTOR,
-    POOL_STAKE_SELECTOR,
-    POOL_GET_REWARD_SELECTOR,
-    POOL_EXIT_SELECTOR
-};
 
 // Function to dispatch calls from the ethereum app.
 void dispatch_plugin_calls(int message, void *parameters) {
@@ -64,6 +45,16 @@ void dispatch_plugin_calls(int message, void *parameters) {
             break;
         default:
             PRINTF("Unhandled message %d\n", message);
+            break;
+    }
+}
+
+void handle_query_ui_exception(unsigned int *args) {
+    switch (args[0]) {
+        case ETH_PLUGIN_QUERY_CONTRACT_UI:
+            ((ethQueryContractUI_t *) args[1])->result = ETH_PLUGIN_RESULT_ERROR;
+            break;
+        default:
             break;
     }
 }
@@ -105,12 +96,23 @@ __attribute__((section(".boot"))) int main(int arg0) {
                 if (args[0] != ETH_PLUGIN_CHECK_PRESENCE) {
                     dispatch_plugin_calls(args[0], (void *) args[1]);
                 }
-
-                // Call `os_lib_end`, go back to the ethereum app.
-                os_lib_end();
             }
         }
+        CATCH_OTHER(e) {
+            switch (e) {
+                // These exceptions are only generated on handle_query_contract_ui()
+                case 0x6502:
+                case EXCEPTION_OVERFLOW:
+                    handle_query_ui_exception((unsigned int *) arg0);
+                    break;
+                default:
+                    break;
+            }
+            PRINTF("Exception 0x%x caught\n", e);
+        }
         FINALLY {
+            // Call `os_lib_end`, go back to the ethereum app.
+            os_lib_end();
         }
     }
     END_TRY;

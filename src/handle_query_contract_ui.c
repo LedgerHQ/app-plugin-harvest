@@ -1,8 +1,6 @@
 #include "harvest_plugin.h"
 
-
 static void set_amount(ethQueryContractUI_t *msg, const context_t *context) {
-
     strlcpy(msg->title, "Amount", msg->titleLength);
 
     uint8_t decimals;
@@ -40,6 +38,7 @@ static void set_destination_ui(ethQueryContractUI_t *msg, context_t *context) {
             break;
         default:
             strlcpy(msg->title, "Pool", msg->titleLength);
+            break;
     }
 
     // Prefix the address with `0x`.
@@ -49,21 +48,10 @@ static void set_destination_ui(ethQueryContractUI_t *msg, context_t *context) {
 
     uint64_t chainId = 0;
 
-    getEthAddressStringFromBinary(
-        msg->pluginSharedRO->txContent->destination,
-        m + 2,  // +2 here because we've already prefixed with '0x'.
-        msg->pluginSharedRW->sha3,
-        chainId);
-
-    // make short representation of the address
-    m[6] = '.';
-    m[7] = '.';
-    m[8] = '.';
-    m[9] = m[38];
-    m[10] = m[39];
-    m[11] = m[40];
-    m[12] = m[41];
-    m[13] = '\0';
+    getEthAddressStringFromBinary(msg->pluginSharedRO->txContent->destination,
+                                  m + 2,  // +2 here because we've already prefixed with '0x'.
+                                  msg->pluginSharedRW->sha3,
+                                  chainId);
 }
 
 void handle_query_contract_ui(void *parameters) {

@@ -3,9 +3,9 @@
 import fetch from 'isomorphic-fetch';
 import fs from 'fs';
 import {utils} from 'ethers';
-import VaultAbi from './abis/harvest_vault.json';
-import PoolAbi from './abis/harvest_pool.json';
-const VAULTS_URL = 'https://api-ui.harvest.finance/vaults?key=41e90ced-d559-4433-b390-af424fdc76d6'
+import VaultAbi from './abis/harvest_vault.json' assert { type: 'json' };
+import PoolAbi from './abis/harvest_pool.json' assert { type: 'json' };
+const VAULTS_URL = 'https://api.harvest.finance/vaults?key=41e90ced-d559-4433-b390-af424fdc76d6'
 
 const abisPath = 'harvest/abis/';
 const b2cFile = 'harvest/b2c';
@@ -46,18 +46,20 @@ function b2cPoolTemplate(vault) {
 
 function contractsInfoVaultTemplate(v) {
   // address must be mixed case checksum
-  return `_HARVEST("${utils.getAddress(v.vaultAddress)}", "${v.id} ", ${v.decimals}, "f${v.id} ", 18);`;
+  return `_HARVEST("${utils.getAddress(v.vaultAddress)}", "${v.id}", ${v.decimals}, "f${v.id}", 18)`;
 }
 
 function contractsInfoPoolTemplate(v) {
   // address must be mixed case checksum
-  return `_HARVEST("${utils.getAddress(v.rewardPool)}", "f${v.id} ", 18, "", 18);`;
+  return `_HARVEST("${utils.getAddress(v.rewardPool)}", "f${v.id}", 18, "", 18)`;
 }
 
 async function fetchJson(url) {
   const response = await fetch(url);
   return response.json();
 }
+
+let contractsInfo = [];
 
 async function updateContractsInfo(vaultsUrl) {
   const allVaults = await fetchJson(vaultsUrl);
@@ -66,11 +68,14 @@ async function updateContractsInfo(vaultsUrl) {
   await updateContractsForNetwork(56,  allVaults.bsc);
   await updateContractsForNetwork(137, allVaults.matic);
 
+  saveString(contractsInfoFile, contractsInfo.join('\n'));
 }
 
+
 async function updateContractsForNetwork(chainId, vaults) {
-  let contractsInfo = [];
   const contracts = [];
+
+  contractsInfo.push(`// ${chainId}`);
 
   for (const id in vaults) {
     const vault = vaults[id];
@@ -89,9 +94,6 @@ async function updateContractsForNetwork(chainId, vaults) {
       contractsInfo.push(contractsInfoPoolTemplate(vault));
     }
   }
-
-  const ci = contractsInfo.join('\n');
-  saveString(contractsInfoFile, ci);
 
   saveB2C(b2cFile, contracts, chainId);
 }
@@ -112,9 +114,11 @@ function saveObject(filename, obj) {
 }
 
 function saveString(filename, text) {
-  return fs.writeFile(filename, text, err => {
-    if (err) console.error(err);
-    else console.log('saved', filename);
+  fs.truncate(filename, 0, function() {
+    return fs.writeFile(filename, text, err => {
+      if (err) console.error(err);
+      else console.log('saved', filename);
+    });
   });
 }
 

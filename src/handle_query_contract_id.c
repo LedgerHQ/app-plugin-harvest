@@ -18,15 +18,24 @@ void handle_query_contract_id(void *parameters) {
     selector_t selectorIndex = context->selectorIndex;
 
     switch (selectorIndex) {
-        case VAULT_DEPOSIT:   set_msg(msg, "Deposit");  break;
-        case VAULT_WITHDRAW:  set_msg(msg, "Withdraw"); break;
-        case POOL_STAKE:      set_msg(msg, "Stake");    break;
-        case POOL_EXIT:       set_msg(msg, "Exit");     break;
-        case POOL_GET_REWARD: set_msg(msg, "Claim");    break;
+        case VAULT_DEPOSIT:
+            set_msg(msg, "Deposit");
+            break;
+        case VAULT_WITHDRAW:
+            set_msg(msg, "Withdraw");
+            break;
+        case POOL_STAKE:
+            set_msg(msg, "Stake");
+            break;
+        case POOL_EXIT:
+            set_msg(msg, "Exit");
+            break;
+        case POOL_GET_REWARD:
+            set_msg(msg, "Claim");
+            break;
         default:
             PRINTF("Selector index: %d not supported\n", selectorIndex);
             msg->result = ETH_PLUGIN_RESULT_ERROR;
             break;
     }
-
 }
