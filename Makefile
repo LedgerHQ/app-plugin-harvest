@@ -79,7 +79,6 @@ endif
 
 
 # Enabling debug PRINTF
-DEBUG:= 10
 ifneq ($(DEBUG),0)
         DEFINES += DEBUG
         DEFINES += HAVE_STACK_OVERFLOW_CHECK
