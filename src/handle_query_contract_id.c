@@ -33,6 +33,9 @@ void handle_query_contract_id(void *parameters) {
         case POOL_GET_REWARD:
             set_msg(msg, "Claim");
             break;
+        case WIDO_EXECUTE_ORDER:
+            set_msg(msg, "Wido Execute");
+            break;
         default:
             PRINTF("Selector index: %d not supported\n", selectorIndex);
             msg->result = ETH_PLUGIN_RESULT_ERROR;

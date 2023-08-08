@@ -37,33 +37,46 @@ void handle_finalize(void *parameters) {
     selector_t selectorIndex = context->selectorIndex;
     msg->numScreens = selectorIndex == POOL_GET_REWARD || selectorIndex == POOL_EXIT ? 1 : 2;
 
-    // Fill context underlying and vault ticker/decimals
-    char *addr = context->contract_address;
-    addr[0] = '0';
-    addr[1] = 'x';
+    if (selectorIndex != WIDO_EXECUTE_ORDER) {
+        // Fill context underlying and vault ticker/decimals
+        char *addr = context->contract_address;
+        addr[0] = '0';
+        addr[1] = 'x';
 
-    uint64_t chainId = 0;
-    getEthAddressStringFromBinary(msg->pluginSharedRO->txContent->destination,
-                                  addr + 2,  // +2 here because we've already prefixed with '0x'.
-                                  msg->pluginSharedRW->sha3,
-                                  chainId);
-    PRINTF("MSG Address: %s\n", addr);
+        uint64_t chainId = 0;
+        getEthAddressStringFromBinary(msg->pluginSharedRO->txContent->destination,
+                                    addr + 2,  // +2 here because we've already prefixed with '0x'.
+                                    msg->pluginSharedRW->sha3,
+                                    chainId);
+        PRINTF("MSG Address: %s\n", addr);
 
-    contract_info_t *info = find_contract_info(addr);
+        contract_info_t *info = find_contract_info(addr);
 
-    if (info == NULL) {  // if contract info is not found
-        msg->result = ETH_PLUGIN_RESULT_UNAVAILABLE;
+        if (info == NULL) {  // if contract info is not found
+            msg->result = ETH_PLUGIN_RESULT_UNAVAILABLE;
 
+        } else {
+            strlcpy(context->underlying_ticker,
+                    (char *) PIC(info->underlying_ticker),
+                    sizeof(context->underlying_ticker));
+            context->underlying_decimals = info->underlying_decimals;
+            strlcpy(context->vault_ticker,
+                    (char *) PIC(info->vault_ticker),
+                    sizeof(context->vault_ticker));
+            context->vault_decimals = info->vault_decimals;
+
+            msg->uiType = ETH_UI_TYPE_GENERIC;
+            msg->result = ETH_PLUGIN_RESULT_OK;
+        }
     } else {
-        strlcpy(context->underlying_ticker,
-                (char *) PIC(info->underlying_ticker),
-                sizeof(context->underlying_ticker));
-        context->underlying_decimals = info->underlying_decimals;
-        strlcpy(context->vault_ticker,
-                (char *) PIC(info->vault_ticker),
-                sizeof(context->vault_ticker));
-        context->vault_decimals = info->vault_decimals;
-
+        if (!ADDRESS_IS_NETWORK_TOKEN(context->from_address)) {
+            // Address is not network token (0xeee...) so we will need to look up the token in the
+            // CAL.
+            msg->tokenLookup1 = context->from_address;
+        } else {
+            sent_network_token(context);
+            msg->tokenLookup1 = NULL;
+        }
         msg->uiType = ETH_UI_TYPE_GENERIC;
         msg->result = ETH_PLUGIN_RESULT_OK;
     }
