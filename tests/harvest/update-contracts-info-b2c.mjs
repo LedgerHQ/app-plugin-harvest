@@ -16,7 +16,7 @@ function getWidoRouter() {
     "address": "0x7fb69e8fb1525ceec03783ffd8a317bafbdfd394",
     "contractName": "WidoRouter",
     "selectors": {
-        "0x916a3bd9": {"erc20OfInterest": ["route.0.fromToken"],"method": "executeOrder(((address,uint256)[],(address,uint256)[],address,uint32,uint32),(address,address,bytes,int32)[],uint256,address)","plugin": "Harvest"}
+        "0x916a3bd9": {"erc20OfInterest": ["route.0.fromToken","order.outputs.-1.tokenAddress"],"method": "executeOrder(((address,uint256)[],(address,uint256)[],address,uint32,uint32),(address,address,bytes,int32)[],uint256,address)","plugin": "Harvest"}
     }
   }
 }

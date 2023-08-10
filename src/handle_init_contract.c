@@ -51,7 +51,7 @@ void handle_init_contract(void *parameters) {
             context->next_param = AMOUNT;
             break;
         case WIDO_EXECUTE_ORDER:
-            context->next_param = FROM_ADDRESS;
+            context->next_param = INIT_EXECUTE;
             break;
         case POOL_GET_REWARD:
         case POOL_EXIT:

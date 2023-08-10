@@ -6,16 +6,32 @@ void handle_provide_token(void *parameters) {
     selector_t selectorIndex = context->selectorIndex;
     
     if (selectorIndex == WIDO_EXECUTE_ORDER) {
-        PRINTF("Wido router token: 0x%p\n", msg->item1);
-        if (ADDRESS_IS_NETWORK_TOKEN(context->from_address)) {
+        PRINTF("Wido router token: 0x%p, 0x%p\n", msg->item1, msg->item2);
+        if (ADDRESS_IS_NETWORK_TOKEN(context->contract_address)) {
             sent_network_token(context);
+            context->tokens_sent_found = true;
         } else if (msg->item1 != NULL) {
-            context->from_address_decimals = msg->item1->token.decimals;
-            strlcpy(context->from_address_ticker, (char *) msg->item1->token.ticker, sizeof(context->from_address_ticker));
+            context->underlying_decimals = msg->item1->token.decimals;
+            strlcpy(context->underlying_ticker, (char *) msg->item1->token.ticker, sizeof(context->underlying_ticker));
+            context->tokens_sent_found = true;
         } else {
             // CAL did not find the token and token is not ETH.
-            context->from_address_decimals = DEFAULT_DECIMAL;
-            strlcpy(context->from_address_ticker, DEFAULT_TICKER, sizeof(context->from_address_ticker));
+            context->underlying_decimals = DEFAULT_DECIMAL;
+            strlcpy(context->underlying_ticker, DEFAULT_TICKER, sizeof(context->underlying_ticker));
+            context->tokens_sent_found = false;
+            // We will need an additional screen to display a warning message.
+            msg->additionalScreens++;
+        }
+
+        if (ADDRESS_IS_NETWORK_TOKEN(context->to_address)) {
+            received_network_token(context);
+        } else if (msg->item2 != NULL) {
+            context->to_decimals = msg->item2->token.decimals;
+            strlcpy(context->to_ticker, (char *) msg->item2->token.ticker, sizeof(context->to_ticker));
+        } else {
+            // CAL did not find the token and token is not ETH.
+            context->to_decimals = DEFAULT_DECIMAL;
+            strlcpy(context->to_ticker, DEFAULT_TICKER, sizeof(context->to_ticker));
             // We will need an additional screen to display a warning message.
             msg->additionalScreens++;
         }

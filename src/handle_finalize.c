@@ -69,13 +69,22 @@ void handle_finalize(void *parameters) {
             msg->result = ETH_PLUGIN_RESULT_OK;
         }
     } else {
-        if (!ADDRESS_IS_NETWORK_TOKEN(context->from_address)) {
-            // Address is not network token (0xeee...) so we will need to look up the token in the
+        if (!ADDRESS_IS_NETWORK_TOKEN(context->contract_address)) {
+            // Address is not network token (0x000...) so we will need to look up the token in the
             // CAL.
-            msg->tokenLookup1 = context->from_address;
+            msg->tokenLookup1 = context->contract_address;
         } else {
             sent_network_token(context);
             msg->tokenLookup1 = NULL;
+        }
+
+        if (!ADDRESS_IS_NETWORK_TOKEN(context->to_address)) {
+            // Address is not network token (0x000...) so we will need to look up the token in the
+            // CAL.
+            msg->tokenLookup2 = context->to_address;
+        } else {
+            received_network_token(context);
+            msg->tokenLookup2 = NULL;
         }
         msg->uiType = ETH_UI_TYPE_GENERIC;
         msg->result = ETH_PLUGIN_RESULT_OK;
