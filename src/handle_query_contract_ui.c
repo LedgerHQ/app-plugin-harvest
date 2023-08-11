@@ -38,6 +38,11 @@ static void set_ui(ethQueryContractUI_t *msg, const context_t *context, int ui_t
         strlcpy(msg->title, "Swap From", msg->titleLength);
         decimals = context->underlying_decimals;
         ticker = context->underlying_ticker;
+        if (ADDRESS_IS_NETWORK_TOKEN(context->contract_address)) {
+            strlcpy(context->underlying_ticker,
+                    msg->network_ticker,
+                    sizeof(context->underlying_ticker));
+        }
         amountToString(context->amount,
                        sizeof(context->amount),
                        decimals,
@@ -48,6 +53,9 @@ static void set_ui(ethQueryContractUI_t *msg, const context_t *context, int ui_t
         strlcpy(msg->title, "Swap To", msg->titleLength);
         decimals = context->to_decimals;
         ticker = context->to_ticker;
+        if (ADDRESS_IS_NETWORK_TOKEN(context->to_address)) {
+            strlcpy(context->to_ticker, msg->network_ticker, sizeof(context->to_ticker));
+        }
         amountToString(context->to_amount,
                        sizeof(context->to_amount),
                        decimals,
