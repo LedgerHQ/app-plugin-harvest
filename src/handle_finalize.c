@@ -44,10 +44,11 @@ void handle_finalize(void *parameters) {
         addr[1] = 'x';
 
         uint64_t chainId = 0;
-        getEthAddressStringFromBinary(msg->pluginSharedRO->txContent->destination,
-                                    addr + 2,  // +2 here because we've already prefixed with '0x'.
-                                    msg->pluginSharedRW->sha3,
-                                    chainId);
+        getEthAddressStringFromBinary(
+            msg->pluginSharedRO->txContent->destination,
+            addr + 2,  // +2 here because we've already prefixed with '0x'.
+            msg->pluginSharedRW->sha3,
+            chainId);
         PRINTF("MSG Address: %s\n", addr);
 
         contract_info_t *info = find_contract_info(addr);

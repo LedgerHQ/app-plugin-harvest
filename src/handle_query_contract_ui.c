@@ -23,18 +23,18 @@ static void set_amount(ethQueryContractUI_t *msg, const context_t *context) {
     }
 
     amountToString(context->amount,
-                       sizeof(context->amount),
-                       decimals,
-                       ticker,
-                       msg->msg,
-                       msg->msgLength);
+                   sizeof(context->amount),
+                   decimals,
+                   ticker,
+                   msg->msg,
+                   msg->msgLength);
 }
 
 static void set_ui(ethQueryContractUI_t *msg, const context_t *context, int ui_type) {
     uint8_t decimals;
     const char *ticker;
 
-    if(ui_type == 0 ) {
+    if (ui_type == 0) {
         strlcpy(msg->title, "Swap From", msg->titleLength);
         decimals = context->underlying_decimals;
         ticker = context->underlying_ticker;
@@ -76,9 +76,9 @@ static void set_destination_ui(ethQueryContractUI_t *msg, context_t *context) {
     uint64_t chainId = 0;
 
     getEthAddressStringFromBinary(msg->pluginSharedRO->txContent->destination,
-                                m + 2,  // +2 here because we've already prefixed with '0x'.
-                                msg->pluginSharedRW->sha3,
-                                chainId);
+                                  m + 2,  // +2 here because we've already prefixed with '0x'.
+                                  msg->pluginSharedRW->sha3,
+                                  chainId);
 }
 
 static void set_warn_ui(ethQueryContractUI_t *msg) {
@@ -117,11 +117,11 @@ void handle_query_contract_ui(void *parameters) {
     } else {
         switch (msg->screenIndex) {
             case 0:
-                set_ui(msg, context, 0); // set swap from token ui
+                set_ui(msg, context, 0);  // set swap from token ui
                 break;
             case 1:
                 if (context->tokens_sent_found) {
-                    set_ui(msg, context, 1); // set swap to token ui
+                    set_ui(msg, context, 1);  // set swap to token ui
                 } else {
                     set_warn_ui(msg);
                 }
@@ -130,7 +130,7 @@ void handle_query_contract_ui(void *parameters) {
                 if (context->tokens_sent_found) {
                     set_warn_ui(msg);
                 } else {
-                    set_ui(msg, context, 1); // set swap to token ui
+                    set_ui(msg, context, 1);  // set swap to token ui
                 }
                 break;
             case 3:

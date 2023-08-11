@@ -4,7 +4,7 @@ void handle_provide_token(void *parameters) {
     ethPluginProvideInfo_t *msg = (ethPluginProvideInfo_t *) parameters;
     context_t *context = (context_t *) msg->pluginContext;
     selector_t selectorIndex = context->selectorIndex;
-    
+
     if (selectorIndex == WIDO_EXECUTE_ORDER) {
         PRINTF("Wido router token: 0x%p, 0x%p\n", msg->item1, msg->item2);
         if (ADDRESS_IS_NETWORK_TOKEN(context->contract_address)) {
@@ -12,7 +12,9 @@ void handle_provide_token(void *parameters) {
             context->tokens_sent_found = true;
         } else if (msg->item1 != NULL) {
             context->underlying_decimals = msg->item1->token.decimals;
-            strlcpy(context->underlying_ticker, (char *) msg->item1->token.ticker, sizeof(context->underlying_ticker));
+            strlcpy(context->underlying_ticker,
+                    (char *) msg->item1->token.ticker,
+                    sizeof(context->underlying_ticker));
             context->tokens_sent_found = true;
         } else {
             // CAL did not find the token and token is not ETH.
@@ -27,7 +29,9 @@ void handle_provide_token(void *parameters) {
             received_network_token(context);
         } else if (msg->item2 != NULL) {
             context->to_decimals = msg->item2->token.decimals;
-            strlcpy(context->to_ticker, (char *) msg->item2->token.ticker, sizeof(context->to_ticker));
+            strlcpy(context->to_ticker,
+                    (char *) msg->item2->token.ticker,
+                    sizeof(context->to_ticker));
         } else {
             // CAL did not find the token and token is not ETH.
             context->to_decimals = DEFAULT_DECIMAL;
