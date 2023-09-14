@@ -1,6 +1,6 @@
-# app-plugin-boilerplate
+# app-plugin-harvest
 
-This repo is a meant to be a forkable example of a plugin.
+This repo is a app plugin for Harvest Finance.
 
 Plugins are lightweight applications that go hand-in-hand with the Ethereum
 Application on a Nano S / X device.

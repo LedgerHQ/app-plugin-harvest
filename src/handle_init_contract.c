@@ -50,7 +50,9 @@ void handle_init_contract(void *parameters) {
         case POOL_STAKE:
             context->next_param = AMOUNT;
             break;
-
+        case WIDO_EXECUTE_ORDER:
+            context->next_param = INIT_EXECUTE;
+            break;
         case POOL_GET_REWARD:
         case POOL_EXIT:
             context->next_param = UNEXPECTED_PARAMETER;
