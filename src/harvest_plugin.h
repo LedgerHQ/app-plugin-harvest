@@ -82,13 +82,6 @@ typedef struct context_t {
 // this check.
 _Static_assert(sizeof(context_t) <= 5 * 32, "Structure of parameters too big.");
 
-void handle_provide_parameter(void *parameters);
-void handle_query_contract_ui(void *parameters);
-void handle_init_contract(void *parameters);
-void handle_finalize(void *parameters);
-void handle_provide_token(void *parameters);
-void handle_query_contract_id(void *parameters);
-
 typedef struct contract_info_t {
     char *address;
     // underlying
