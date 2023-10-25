@@ -30,8 +30,7 @@ contract_info_t *find_contract_info(const char *address) {
     return NULL;
 }
 
-void handle_finalize(void *parameters) {
-    ethPluginFinalize_t *msg = (ethPluginFinalize_t *) parameters;
+void handle_finalize(ethPluginFinalize_t *msg) {
     context_t *context = (context_t *) msg->pluginContext;
 
     selector_t selectorIndex = context->selectorIndex;
@@ -44,11 +43,14 @@ void handle_finalize(void *parameters) {
         addr[1] = 'x';
 
         uint64_t chainId = 0;
-        getEthAddressStringFromBinary(
-            msg->pluginSharedRO->txContent->destination,
-            addr + 2,  // +2 here because we've already prefixed with '0x'.
-            msg->pluginSharedRW->sha3,
-            chainId);
+        if (!getEthAddressStringFromBinary(
+                msg->pluginSharedRO->txContent->destination,
+                addr + 2,  // +2 here because we've already prefixed with '0x'.
+                msg->pluginSharedRW->sha3,
+                chainId)) {
+            msg->result = ETH_PLUGIN_RESULT_ERROR;
+            return;
+        }
         PRINTF("MSG Address: %s\n", addr);
 
         contract_info_t *info = find_contract_info(addr);
