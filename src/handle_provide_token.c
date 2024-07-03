@@ -1,11 +1,14 @@
-#include "harvest_plugin.h"
+#include "plugin.h"
 
+// EDIT THIS: Adapt this function to your needs! Remember, the information for tokens are held in
+// `msg->token1` and `msg->token2`. If those pointers are `NULL`, this means the ethereum app didn't
+// find any info regarding the requested tokens!
 void handle_provide_token(ethPluginProvideInfo_t *msg) {
     context_t *context = (context_t *) msg->pluginContext;
     selector_t selectorIndex = context->selectorIndex;
 
-    if (selectorIndex == WIDO_EXECUTE_ORDER) {
-        PRINTF("Wido router token: 0x%p, 0x%p\n", msg->item1, msg->item2);
+    if (selectorIndex == PORTAL) {
+        PRINTF("Portal router token: 0x%p, 0x%p\n", msg->item1, msg->item2);
         if (ADDRESS_IS_NETWORK_TOKEN(context->contract_address)) {
             sent_network_token(context);
             context->tokens_sent_found = true;
