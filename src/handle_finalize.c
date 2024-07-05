@@ -28,7 +28,7 @@ const contract_info_t *find_contract_info(const char *address) {
     PRINTF("Contracts length: %d\n", len);
     for (int i = 0; i < len; i++) {
         const contract_info_t *ci = &contracts[i];
-        if (memcmp(address, (char *) PIC(ci->address), 42) == 0) return ci;
+        if (memcmp(address, (char *) ci->address, 42) == 0) return ci;
     }
     // when contract is not found
     return NULL;
@@ -65,11 +65,11 @@ void handle_finalize(ethPluginFinalize_t *msg) {
 
         } else {
             strlcpy(context->underlying_ticker,
-                    (char *) PIC(info->underlying_ticker),
+                    (char *) info->underlying_ticker,
                     sizeof(context->underlying_ticker));
             context->underlying_decimals = info->underlying_decimals;
             strlcpy(context->vault_ticker,
-                    (char *) PIC(info->vault_ticker),
+                    (char *) info->vault_ticker,
                     sizeof(context->vault_ticker));
             context->vault_decimals = info->vault_decimals;
 
