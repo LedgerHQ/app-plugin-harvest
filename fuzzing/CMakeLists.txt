@@ -100,7 +100,6 @@ add_executable(fuzz
     mocks.c
 
     # sdk utils
-    ${BOLOS_SDK}/src/pic.c
     ${BOLOS_SDK}/src/ledger_assert.c
     ${BOLOS_SDK}/lib_standard_app/format.c
 

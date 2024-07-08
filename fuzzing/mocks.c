@@ -46,3 +46,7 @@ cx_err_t cx_keccak_256_hash_iovec(const cx_iovec_t *iovec,
 void os_sched_exit(bolos_task_status_t exit_code) {
     return;
 }
+
+void *pic(void *p) {
+    return p;
+}
