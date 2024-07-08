@@ -1,6 +1,6 @@
-#include "harvest_plugin.h"
+#include "plugin.h"
 
-void set_msg(ethQueryContractID_t *msg, char *text) {
+void set_msg(ethQueryContractID_t *msg, const char *text) {
     strlcpy(msg->version, text, msg->versionLength);
 }
 
@@ -11,7 +11,7 @@ void handle_query_contract_id(ethQueryContractID_t *msg) {
     // msg->version will be the lower sentence displayed on the screen.
 
     // For the first screen, display the plugin name.
-    strlcpy(msg->name, PLUGIN_NAME, msg->nameLength);
+    strlcpy(msg->name, APPNAME, msg->nameLength);
 
     msg->result = ETH_PLUGIN_RESULT_OK;
     selector_t selectorIndex = context->selectorIndex;
@@ -32,8 +32,8 @@ void handle_query_contract_id(ethQueryContractID_t *msg) {
         case POOL_GET_REWARD:
             set_msg(msg, "Claim");
             break;
-        case WIDO_EXECUTE_ORDER:
-            set_msg(msg, "Wido Execute");
+        case PORTAL:
+            set_msg(msg, "Portal");
             break;
         default:
             PRINTF("Selector index: %d not supported\n", selectorIndex);

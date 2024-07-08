@@ -1,5 +1,4 @@
-#include <stdbool.h>
-#include "harvest_plugin.h"
+#include "plugin.h"
 
 static bool set_amount(ethQueryContractUI_t *msg, const context_t *context) {
     strlcpy(msg->title, "Amount", msg->titleLength);
@@ -40,7 +39,7 @@ static bool set_ui(ethQueryContractUI_t *msg, const context_t *context, int ui_t
         decimals = context->underlying_decimals;
         ticker = context->underlying_ticker;
         if (ADDRESS_IS_NETWORK_TOKEN(context->contract_address)) {
-            strlcpy(context->underlying_ticker,
+            strlcpy((char *) context->underlying_ticker,
                     msg->network_ticker,
                     sizeof(context->underlying_ticker));
         }
@@ -55,7 +54,7 @@ static bool set_ui(ethQueryContractUI_t *msg, const context_t *context, int ui_t
         decimals = context->to_decimals;
         ticker = context->to_ticker;
         if (ADDRESS_IS_NETWORK_TOKEN(context->to_address)) {
-            strlcpy(context->to_ticker, msg->network_ticker, sizeof(context->to_ticker));
+            strlcpy((char *) context->to_ticker, msg->network_ticker, sizeof(context->to_ticker));
         }
         ret = amountToString(context->to_amount,
                              sizeof(context->to_amount),
@@ -88,7 +87,6 @@ static bool set_destination_ui(ethQueryContractUI_t *msg, context_t *context) {
     return getEthAddressStringFromBinary(
         msg->pluginSharedRO->txContent->destination,
         m + 2,  // +2 here because we've already prefixed with '0x'.
-        msg->pluginSharedRW->sha3,
         chainId);
 }
 
@@ -110,7 +108,8 @@ void handle_query_contract_ui(ethQueryContractUI_t *msg) {
     memset(msg->title, 0, msg->titleLength);
     memset(msg->msg, 0, msg->msgLength);
 
-    if (selectorIndex != WIDO_EXECUTE_ORDER) {
+    // EDIT THIS: Adapt the cases for the screens you'd like to display.
+    if (selectorIndex != PORTAL) {
         switch (msg->screenIndex) {
             case 0:
                 ret = set_destination_ui(msg, context);

@@ -1,7 +1,0 @@
-export const addressbook = {
-  fDAI_VAULT:  '0xab7FA2B2985BCcfC13c6D86b1D5A17486ab1e04C'.toLowerCase(),
-  fDAI_POOL:   '0x15d3A64B2d5ab9E152F16593Cdebc4bB165B5B4A'.toLowerCase(),
-  fUSDC_VAULT: '0xf0358e8c3CD5Fa238a29301d0bEa3D63A17bEdBE'.toLowerCase(),
-  fUSDC_POOL: '0x4F7c28cCb0F1Dbd1388209C67eEc234273C878Bd'.toLowerCase(),
-  WIDO_ROUTER: '0x7Fb69e8fb1525ceEc03783FFd8a317bafbDfD394'.toLowerCase(),
-}

@@ -2,23 +2,48 @@
 
 import fetch from 'isomorphic-fetch';
 import fs from 'fs';
-import {utils} from 'ethers';
-import VaultAbi from './abis/harvest_vault.json' assert { type: 'json' };
-import PoolAbi from './abis/harvest_pool.json' assert { type: 'json' };
+import {ethers} from 'ethers';
+import VaultAbi from '../abis/harvest_vault.json' assert { type: 'json' };
+import PoolAbi from '../abis/harvest_pool.json' assert { type: 'json' };
 const VAULTS_URL = 'https://api.harvest.finance/vaults?key=41e90ced-d559-4433-b390-af424fdc76d6'
 
-const abisPath = 'harvest/abis/';
-const b2cFile = 'harvest/b2c';
-const contractsInfoFile = '../src/contracts-info.txt';
+const abisPath = '../abis';
+const b2cFile = '../abis/b2c';
+const contractsInfoFile = '../../src/contracts-info.txt';
 
-function getWidoRouter() {
-  return {
-    "address": "0x7fb69e8fb1525ceec03783ffd8a317bafbdfd394",
-    "contractName": "WidoRouter",
-    "selectors": {
-        "0x916a3bd9": {"erc20OfInterest": ["route.0.fromToken","order.outputs.-1.tokenAddress"],"method": "executeOrder(((address,uint256)[],(address,uint256)[],address,uint32,uint32),(address,address,bytes,int32)[],uint256,address)","plugin": "Harvest"}
+function getPortalRouter(chainId) {
+  if(chainId === 1)
+    return {
+      "address": "0xbf5a7f3629fb325e2a8453d595ab103465f75e62",
+      "contractName": "PortalsRouter",
+      "selectors": {
+          "0x916a3bd9": {"erc20OfInterest": ["orderPayload.order.inputToken","orderPayload.order.outputToken"],"method": "portal((address,uint256,address,uint256,address),(address,address,bytesuint256)[],address)","plugin": "Harvest"}
+      }
     }
-  }
+  else if(chainId === 137)
+    return {
+      "address": "0xc74063fdb47fe6dce6d029a489bab37b167da57f",
+      "contractName": "PortalsRouter",
+      "selectors": {
+          "0x916a3bd9": {"erc20OfInterest": ["orderPayload.order.inputToken","orderPayload.order.outputToken"],"method": "portal((address,uint256,address,uint256,address),(address,address,bytesuint256)[],address)","plugin": "Harvest"}
+      }
+    }
+  else if(chainId === 42161)
+    return {
+      "address": "0x34b6a821d2f26c6b7cdb01cd91895170c6574a0d",
+      "contractName": "PortalsRouter",
+      "selectors": {
+          "0x916a3bd9": {"erc20OfInterest": ["orderPayload.order.inputToken","orderPayload.order.outputToken"],"method": "portal((address,uint256,address,uint256,address),(address,address,bytesuint256)[],address)","plugin": "Harvest"}
+      }
+    }
+  else if(chainId === 8453)
+    return {
+      "address": "0xb0324286b3ef7dddc93fb2ff7c8b7b8a3524803c",
+      "contractName": "PortalsRouter",
+      "selectors": {
+          "0x916a3bd9": {"erc20OfInterest": ["orderPayload.order.inputToken","orderPayload.order.outputToken"],"method": "portal((address,uint256,address,uint256,address),(address,address,bytesuint256)[],address)","plugin": "Harvest"}
+      }
+    }
 }
 
 function b2cTemplate(chainId, contracts) {
@@ -56,12 +81,12 @@ function b2cPoolTemplate(vault) {
 
 function contractsInfoVaultTemplate(v) {
   // address must be mixed case checksum
-  return `_HARVEST("${utils.getAddress(v.vaultAddress)}", "${v.id}", ${v.decimals}, "f${v.id}", 18)`;
+  return `_HARVEST("${ethers.getAddress(v.vaultAddress)}", "${v.id}", ${v.decimals}, "f${v.id}", 18)`;
 }
 
 function contractsInfoPoolTemplate(v) {
   // address must be mixed case checksum
-  return `_HARVEST("${utils.getAddress(v.rewardPool)}", "f${v.id}", 18, "", 18)`;
+  return `_HARVEST("${ethers.getAddress(v.rewardPool)}", "f${v.id}", 18, "", 18)`;
 }
 
 async function fetchJson(url) {
@@ -75,8 +100,9 @@ async function updateContractsInfo(vaultsUrl) {
   const allVaults = await fetchJson(vaultsUrl);
 
   await updateContractsForNetwork(1,   allVaults.eth);
-  await updateContractsForNetwork(56,  allVaults.bsc);
   await updateContractsForNetwork(137, allVaults.matic);
+  await updateContractsForNetwork(42161, allVaults.arbitrum);
+  await updateContractsForNetwork(8453, allVaults.base);
 
   saveString(contractsInfoFile, contractsInfo.join('\n'));
 }
@@ -92,21 +118,20 @@ async function updateContractsForNetwork(chainId, vaults) {
 
     if (vault.inactive) continue;
 
-    saveContract(abisPath, vault.vaultAddress.toLowerCase(), VaultAbi);
+    // saveContract(abisPath, vault.vaultAddress.toLowerCase(), VaultAbi);
     contracts.push(b2cVaultTemplate(vault));
 
     // if vault have rewardPool then add its contract
     contractsInfo.push(contractsInfoVaultTemplate(vault));
 
     if (vault.rewardPool) {
-      saveContract(abisPath, vault.rewardPool.toLowerCase(), PoolAbi);
+      // saveContract(abisPath, vault.rewardPool.toLowerCase(), PoolAbi);
       contracts.push(b2cPoolTemplate(vault));
       contractsInfo.push(contractsInfoPoolTemplate(vault));
     }
   }
 
-  if (chainId === 1)
-    contracts.push(getWidoRouter());
+  contracts.push(getPortalRouter(chainId));
   saveB2C(b2cFile, contracts, chainId);
 }
 
