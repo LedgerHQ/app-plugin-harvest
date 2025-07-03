@@ -40,7 +40,7 @@ static bool set_ui(ethQueryContractUI_t *msg, const context_t *context, int ui_t
         decimals = context->underlying_decimals;
         ticker = context->underlying_ticker;
         if (ADDRESS_IS_NETWORK_TOKEN(context->contract_address)) {
-            strlcpy(context->underlying_ticker,
+            strlcpy((char *) context->underlying_ticker,
                     msg->network_ticker,
                     sizeof(context->underlying_ticker));
         }
@@ -55,7 +55,7 @@ static bool set_ui(ethQueryContractUI_t *msg, const context_t *context, int ui_t
         decimals = context->to_decimals;
         ticker = context->to_ticker;
         if (ADDRESS_IS_NETWORK_TOKEN(context->to_address)) {
-            strlcpy(context->to_ticker, msg->network_ticker, sizeof(context->to_ticker));
+            strlcpy((char *) context->to_ticker, msg->network_ticker, sizeof(context->to_ticker));
         }
         ret = amountToString(context->to_amount,
                              sizeof(context->to_amount),
@@ -88,7 +88,6 @@ static bool set_destination_ui(ethQueryContractUI_t *msg, context_t *context) {
     return getEthAddressStringFromBinary(
         msg->pluginSharedRO->txContent->destination,
         m + 2,  // +2 here because we've already prefixed with '0x'.
-        msg->pluginSharedRW->sha3,
         chainId);
 }
 
