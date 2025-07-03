@@ -1,6 +1,6 @@
 #include "harvest_plugin.h"
 
-void set_msg(ethQueryContractID_t *msg, char *text) {
+static void set_msg(ethQueryContractID_t *msg, const char *text) {
     strlcpy(msg->version, text, msg->versionLength);
 }
 

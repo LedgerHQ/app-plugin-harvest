@@ -23,7 +23,10 @@ void handle_init_contract(ethPluginInitContract_t *msg) {
     memset(context, 0, sizeof(*context));
 
     uint32_t selector = U4BE(msg->selector, 0);
-    if (find_selector(selector, HARVEST_SELECTORS, NUM_SELECTORS, (size_t *) &context->selectorIndex)) {
+    if (find_selector(selector,
+                      HARVEST_SELECTORS,
+                      NUM_SELECTORS,
+                      (size_t *) &context->selectorIndex)) {
         msg->result = ETH_PLUGIN_RESULT_UNAVAILABLE;
         return;
     }
