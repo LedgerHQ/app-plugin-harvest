@@ -46,7 +46,6 @@ void handle_finalize(ethPluginFinalize_t *msg) {
         if (!getEthAddressStringFromBinary(
                 msg->pluginSharedRO->txContent->destination,
                 addr + 2,  // +2 here because we've already prefixed with '0x'.
-                msg->pluginSharedRW->sha3,
                 chainId)) {
             msg->result = ETH_PLUGIN_RESULT_ERROR;
             return;
