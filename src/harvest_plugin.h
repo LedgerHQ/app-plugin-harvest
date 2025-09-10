@@ -77,9 +77,9 @@ typedef struct context_t {
     bool tokens_sent_found;
 } context_t;
 
-// Piece of code that will check that the above structure is not bigger than 5 * 32. Do not remove
-// this check.
-_Static_assert(sizeof(context_t) <= 5 * 32, "Structure of parameters too big.");
+// Check that the plugin context structure will fit in the ethereum allocated memory.
+// for us Do not remove!
+ASSERT_SIZEOF_PLUGIN_CONTEXT(context_t);
 
 typedef struct contract_info_t {
     char *address;

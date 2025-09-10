@@ -4,58 +4,61 @@ on:
   workflow_dispatch:
   push:
     branches:
+      - main
       - master
       - develop
   pull_request:
 
 jobs:
-  job_build_release_plugin:
-    name: Build release plugin
-    uses: LedgerHQ/ledger-app-workflows/.github/workflows/reusable_build.yml@v1
-
   job_build_debug_plugin:
-    name: Build debug plugin
+    name: Build plugin using the reusable workflow
     uses: LedgerHQ/ledger-app-workflows/.github/workflows/reusable_build.yml@v1
     with:
-      upload_app_binaries_artifact: plugin_binaries
+      upload_app_binaries_artifact: "plugin_binaries"
       flags: "DEBUG=1"
 
-
-  job_build_ethereum_app:
-    name: Build debug Ethereum app
+  job_build_debug_app:
+    name: Build ethereum using the reusable workflow
     uses: LedgerHQ/ledger-app-workflows/.github/workflows/reusable_build.yml@v1
     with:
       app_repository: LedgerHQ/app-ethereum
-      app_branch_name: ${{ ((github.base_ref || github.ref_name) == 'main' && 'master') || (github.base_ref || github.ref_name) }}
+      app_branch_name: develop
+      upload_app_binaries_artifact: "eth_binaries"
       flags: "DEBUG=1 BYPASS_SIGNATURES=1"
-      upload_app_binaries_artifact: ethereum_binaries
 
   jobs-e2e-tests:
     name: E2E Tests
-    needs: [job_build_debug_plugin, job_build_ethereum_app]
+    needs: [job_build_debug_plugin, job_build_debug_app]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Download built binaries
         uses: actions/download-artifact@v4
         with:
           name: plugin_binaries
-          path: tests/elfs/plugin/
+          path: plugin_binaries
 
       - name: Download built binaries
         uses: actions/download-artifact@v4
         with:
-          name: ethereum_binaries
-          path: tests/elfs/ethereum/
+          name: eth_binaries
+          path: eth_binaries
 
-      - name: Copy Elf files
+      - name: Dispatch binaries
         run: |
-          cp tests/elfs/plugin/nanos2/bin/app.elf tests/elfs/plugin_nanosp.elf
-          cp tests/elfs/plugin/nanox/bin/app.elf tests/elfs/plugin_nanox.elf
-          cp tests/elfs/ethereum/nanos2/bin/app.elf tests/elfs/ethereum_nanosp.elf
-          cp tests/elfs/ethereum/nanox/bin/app.elf tests/elfs/ethereum_nanox.elf
+          mkdir tests/elfs
+
+          mv plugin_binaries/nanox/bin/app.elf tests/elfs/plugin_nanox.elf
+          mv plugin_binaries/nanos2/bin/app.elf tests/elfs/plugin_nanosp.elf
+          mv plugin_binaries/flex/bin/app.elf tests/elfs/plugin_flex.elf
+          mv plugin_binaries/stax/bin/app.elf tests/elfs/plugin_stax.elf
+
+          mv eth_binaries/nanox/bin/app.elf tests/elfs/ethereum_nanox.elf
+          mv eth_binaries/nanos2/bin/app.elf tests/elfs/ethereum_nanosp.elf
+          mv eth_binaries/flex/bin/app.elf tests/elfs/ethereum_flex.elf
+          mv eth_binaries/stax/bin/app.elf tests/elfs/ethereum_stax.elf
 
       - name: Install node
         uses: actions/setup-node@v3
@@ -72,4 +75,4 @@ jobs:
 
       - name: Run Zemu tests
         run: |
-          cd tests && docker pull zondax/builder-zemu@sha256:8d7b06cedf2d018b9464f4af4b7a8357c3fbb180f3ab153f8cb8f138defb22a4 && yarn test
+          cd tests && yarn test

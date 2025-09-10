@@ -86,7 +86,7 @@ static bool set_destination_ui(ethQueryContractUI_t *msg, context_t *context) {
     uint64_t chainId = 0;
 
     return getEthAddressStringFromBinary(
-        msg->pluginSharedRO->txContent->destination,
+        msg->txContent->destination,
         m + 2,  // +2 here because we've already prefixed with '0x'.
         chainId);
 }
