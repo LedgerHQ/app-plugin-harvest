@@ -7,9 +7,9 @@ import { parseEther, parseUnits} from "ethers/lib/utils";
 export const testAmount1_18 = parseUnits("1.2345", '18');
 export const testAmount1_6 = parseUnits("1.2345", '6');
 
-export function testRawTx(method, rawTx, screensS = 5, screensSPX = 5) {
+export function testRawTx(title = '', method, rawTx, screensS = 5, screensSPX = 5) {
   nano_models.forEach(function (model) {
-    test('[Nano ' + model.letter + '] '+method+' raw_tx', zemu(model, async (sim, eth) => {
+    test('[Nano ' + model.letter + '] '+method+' raw_tx' + title, zemu(model, async (sim, eth) => {
 
       const serializedTx = txFromEtherscan(rawTx);
 
@@ -25,7 +25,7 @@ export function testRawTx(method, rawTx, screensS = 5, screensSPX = 5) {
       // Wait for the application to actually load and parse the transaction
       await waitForAppScreen(sim);
       // Navigate the display by pressing the right button `right_clicks` times, then pressing both buttons to accept the transaction.
-      await sim.navigateAndCompareSnapshots('.', model.name + '_'+method+'_raw_tx', [right_clicks, 0]);
+      await sim.navigateAndCompareSnapshots('.', model.name + '_'+method+'_raw_tx' + title, [right_clicks, 0]);
 
       await tx;
     }));
@@ -33,10 +33,10 @@ export function testRawTx(method, rawTx, screensS = 5, screensSPX = 5) {
 }
 
 // Test from constructed transaction
-export function testTx(contractAddr, abi, method, params=[], screensS = 7, screensSPX = 7) {
+export function testTx(title = '', contractAddr, abi, method, params=[], screensS = 7, screensSPX = 7) {
 
   nano_models.forEach(function (model) {
-    test('[Nano ' + model.letter + '] '+method, zemu(model, async (sim, eth) => {
+    test('[Nano ' + model.letter + '] '+method + title, zemu(model, async (sim, eth) => {
       const contract = new ethers.Contract(contractAddr, abi);
 
       // Constants used to create the transaction
@@ -67,7 +67,7 @@ export function testTx(contractAddr, abi, method, params=[], screensS = 7, scree
       // Wait for the application to actually load and parse the transaction
       await waitForAppScreen(sim);
       // Navigate the display by pressing the right button N times, then pressing both buttons to accept the transaction.
-      await sim.navigateAndCompareSnapshots('.', model.name + '_'+method, [right_clicks, 0]);
+      await sim.navigateAndCompareSnapshots('.', model.name + '_'+method + title, [right_clicks, 0]);
 
       await tx;
     }));

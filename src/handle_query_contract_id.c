@@ -1,12 +1,11 @@
 #include "harvest_plugin.h"
 
-void set_msg(ethQueryContractID_t *msg, char *text) {
+static void set_msg(ethQueryContractID_t *msg, const char *text) {
     strlcpy(msg->version, text, msg->versionLength);
 }
 
 // Sets the first screen to display.
-void handle_query_contract_id(void *parameters) {
-    ethQueryContractID_t *msg = (ethQueryContractID_t *) parameters;
+void handle_query_contract_id(ethQueryContractID_t *msg) {
     const context_t *context = (const context_t *) msg->pluginContext;
     // msg->name will be the upper sentence displayed on the screen.
     // msg->version will be the lower sentence displayed on the screen.
@@ -32,6 +31,9 @@ void handle_query_contract_id(void *parameters) {
             break;
         case POOL_GET_REWARD:
             set_msg(msg, "Claim");
+            break;
+        case WIDO_EXECUTE_ORDER:
+            set_msg(msg, "Wido Execute");
             break;
         default:
             PRINTF("Selector index: %d not supported\n", selectorIndex);
